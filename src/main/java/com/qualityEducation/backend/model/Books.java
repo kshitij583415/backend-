@@ -16,4 +16,6 @@ public class Books {
     @Size(min = 0, max = 5)
     private Integer rating;
     private String image;
+    private boolean isPopular = false;
+    private boolean isNew = false;
 }

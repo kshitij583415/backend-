@@ -17,4 +17,9 @@ public class Mentor {
     private String image;
     private List<Course> courses;
     private Long userId; // Add this line
+
+    public void setUserName(String fullName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setUserName'");
+    }
 }

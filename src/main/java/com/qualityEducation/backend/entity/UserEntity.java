@@ -22,6 +22,8 @@ public class UserEntity {
     private String password;
     private Boolean isMentor = false;
     private Boolean isAdmin = false;
+    private String imageUrl;
+    private Long mentorId;
 
     @OneToOne(mappedBy = "user")
     private MentorEntity mentorEntity;

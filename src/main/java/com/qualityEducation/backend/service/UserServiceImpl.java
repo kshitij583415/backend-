@@ -40,6 +40,8 @@ public class UserServiceImpl implements UserService {
         if (userEntity != null) {
             User user = new User();
             BeanUtils.copyProperties(userEntity, user);
+            // Set isMentor field in the User object
+            user.setIsMentor(userEntity.getIsMentor());
             return user;
         }
         return null;

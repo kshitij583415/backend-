@@ -17,6 +17,7 @@ public class Course {
     private Integer rating;
 
     private String standard;
+    private String image;
 
     @JsonIgnoreProperties("courses")
     private Mentor mentor;

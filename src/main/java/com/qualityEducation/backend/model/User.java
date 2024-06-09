@@ -19,4 +19,8 @@ public class User {
     private String email;
     @Size(min = 7, max = 20)
     private String password;
+    private Boolean isMentor = false;
+    private Boolean isAdmin = false;
+    private String imageUrl;
+    private Long mentorId;
 }

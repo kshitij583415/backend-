@@ -25,6 +25,7 @@ public class CoursesEntity {
     private Integer rating;
 
     private String standard;
+    private String image;
 
     @ManyToOne
     @JsonIgnoreProperties("courses")

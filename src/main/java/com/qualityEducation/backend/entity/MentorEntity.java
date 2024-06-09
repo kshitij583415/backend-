@@ -45,4 +45,14 @@ public class MentorEntity {
 
     @OneToMany(mappedBy = "mentor")
     private List<CoursesEntity> courses;
+
+    public Object getExperience() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getExperience'");
+    }
+
+    public Object getDetails() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDetails'");
+    }
 }

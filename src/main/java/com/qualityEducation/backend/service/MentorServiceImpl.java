@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class MentorServiceImpl implements MentorService {
 
     private final MentorRepo mentorRepo;
     private final UserRepo userRepo;
+    private final String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/images/mentor/";
+    private final String baseURL = "http://localhost:9090/images/mentor/";
 
     @Autowired
     public MentorServiceImpl(MentorRepo mentorRepo, UserRepo userRepo) {
@@ -40,29 +43,38 @@ public class MentorServiceImpl implements MentorService {
         }
 
         try {
+            // Generate a unique file name to avoid conflicts
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
             // Save the image
-            String uploadDirectory = System.getProperty("user.dir") + "/src/main/resources/static/images/mentor";
-            String fileName = file.getOriginalFilename();
             Path filePath = Paths.get(uploadDirectory, fileName);
             Files.copy(file.getInputStream(), filePath);
 
-            // Set the image name in the mentor object
-            mentor.setImage(fileName);
+            // Construct the image URL
+            String imageUrl = baseURL + fileName;
+
+            // Set the image URL in the mentor object
+            mentor.setImage(imageUrl);
 
             // Find the user and update their mentor status
             UserEntity userEntity = userRepo.findById(mentor.getUserId()).orElse(null);
-            if (userEntity == null || userEntity.getIsMentor()) {
+            if (userEntity == null || Boolean.TRUE.equals(userEntity.getIsMentor())) {
                 return false; // User not found or already a mentor
             }
 
             // Create and save the mentor entity
             MentorEntity mentorEntity = new MentorEntity();
             BeanUtils.copyProperties(mentor, mentorEntity);
-            mentorEntity.setUser(userEntity); // Set the user in the mentor entity
-            mentorRepo.save(mentorEntity);
+            mentorEntity.setUser(userEntity);
 
-            // Update the user entity to mark them as a mentor
+            // Save the mentor entity to generate the ID
+            MentorEntity savedMentorEntity = mentorRepo.save(mentorEntity);
+
+            // Update the user entity to mark them as a mentor and set the image URL
             userEntity.setIsMentor(true);
+            userEntity.setImageUrl(imageUrl); // Set the image URL in the user entity
+            userEntity.setMentorId(savedMentorEntity.getId());
+
             userRepo.save(userEntity);
 
             System.out.println("Mentor details saved successfully.");

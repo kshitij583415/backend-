@@ -71,5 +71,19 @@ public class UserController {
             return ResponseEntity.status(500).body("Internal Server Error");
         }
     }
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        try {
+            boolean isAuthenticated = userService.authenticateUser(user.getEmail(), user.getPassword());
+            if (isAuthenticated) {
+                return ResponseEntity.ok("Login successful");
+            } else {
+                return ResponseEntity.status(401).body("Invalid credentials");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Internal Server Error");
+        }
+    }
 
 }

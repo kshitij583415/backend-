@@ -12,4 +12,5 @@ public interface UserService {
     List<User> getAllUsers();
 
     boolean makeUserMentor(Long id);
+    boolean authenticateUser(String email, String password);
 }

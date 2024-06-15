@@ -69,4 +69,13 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
+    @Override
+    public boolean authenticateUser(String email, String password) {
+        UserEntity userEntity = userRepo.findByEmail(email);
+        if (userEntity != null) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            return encoder.matches(password, userEntity.getPassword());
+        }
+        return false;
+    }
 }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.qualityEducation.backend.model.User;
 import com.qualityEducation.backend.service.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 public class UserController {
     @Autowired
@@ -72,10 +74,10 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
+    public ResponseEntity<String> loginUser(@RequestBody User user, HttpServletResponse response) {
         try {
-            boolean isAuthenticated = userService.authenticateUser(user.getEmail(), user.getPassword());
-            if (isAuthenticated) {
+            String token = userService.authenticateUser(user.getEmail(), user.getPassword(), response);
+            if (token != null) {
                 return ResponseEntity.ok("Login successful");
             } else {
                 return ResponseEntity.status(401).body("Invalid credentials");

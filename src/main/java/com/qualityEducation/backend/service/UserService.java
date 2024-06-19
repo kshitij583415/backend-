@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.qualityEducation.backend.model.User;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public interface UserService {
     void addUser(User user);
 
@@ -12,5 +14,5 @@ public interface UserService {
     List<User> getAllUsers();
 
     boolean makeUserMentor(Long id);
-    boolean authenticateUser(String email, String password);
+    String authenticateUser(String email, String password, HttpServletResponse response);
 }

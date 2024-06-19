@@ -5,23 +5,30 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.qualityEducation.backend.entity.UserEntity;
 import com.qualityEducation.backend.model.User;
 import com.qualityEducation.backend.repository.UserRepo;
+import com.qualityEducation.backend.utils.JwtUtil;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    private JwtUtil jwtUtil;
 
     @Autowired
-    public UserServiceImpl(UserRepo userRepo) {
+    public UserServiceImpl(UserRepo userRepo, JwtUtil jwtUtil) {
         this.userRepo = userRepo;
+        this.jwtUtil = jwtUtil;
     }
-
     @Override
     public void addUser(User user) {
         UserEntity userEntity = new UserEntity();
@@ -70,12 +77,36 @@ public class UserServiceImpl implements UserService {
         return false;
     }
     @Override
-    public boolean authenticateUser(String email, String password) {
+    public String authenticateUser(String email, String password, HttpServletResponse response) {
         UserEntity userEntity = userRepo.findByEmail(email);
         if (userEntity != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            return encoder.matches(password, userEntity.getPassword());
+            String hashedPassword = userEntity.getPassword();
+
+            // Debug statements to check passwords
+            System.out.println("User found: " + userEntity.getEmail());
+            System.out.println("Entered password: " + password);
+            System.out.println("Stored hashed password: " + hashedPassword);
+
+            if (encoder.matches(password, userEntity.getPassword())) {
+                Long userId = userEntity.getId();
+                List<String> roles = new ArrayList<>();
+                if (userEntity.getIsAdmin()) {
+                    roles.add("ROLE_ADMIN");
+                }
+                if (userEntity.getIsMentor()) {
+                    roles.add("ROLE_MENTOR");
+                }
+                String token = jwtUtil.generateToken(userId, roles);
+                System.out.println("Generated JWT Token: " + token);
+                jwtUtil.addTokenToCookie(token, response);
+                return token;
+            } else {
+                System.out.println("Password mismatch");
+            }
+        } else {
+            System.out.println("User not found with email: " + email);
         }
-        return false;
+        return null;
     }
 }
